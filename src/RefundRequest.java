@@ -5,15 +5,14 @@ public class RefundRequest {
 
 	private int paymentID;
 
-	public RefundRequest(int paymentID) {
-		this.paymentID = paymentID;
+	public RefundRequest() {
 		Database.connect();
 	}
 
 	private boolean isRefunded() {
 
 		boolean refunded = false;
-		String query = "SELECT  * FROM transactions WHERE payment_id = " + paymentID;
+		String query = "SELECT  * FROM transactions WHERE id = " + paymentID;
 
 		Statement statement = null;
 		try {
@@ -31,11 +30,9 @@ public class RefundRequest {
 
 	public boolean makeRefundRequest(int payment_id)  {
 
-		System.out.println(isRefunded());
-
 		if(isRefunded()) {return false;}
 
-		String query = "INSERT INTO refund (payment_id)" + "VALUES(?)";
+		String query = "INSERT INTO refund (transaction_id)" + "VALUES(?)";
 
 		PreparedStatement statement = null;
 		try {

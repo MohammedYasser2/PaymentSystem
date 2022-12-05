@@ -24,7 +24,7 @@ public class Discount {
             Statement statement=Database.connection.createStatement();
             ResultSet resultSet= statement.executeQuery(query);
             if (resultSet.next()){
-                double total=resultSet.getInt("price")*resultSet.getInt("discount")/100;
+                double total=resultSet.getInt("price")-(resultSet.getInt("price")*resultSet.getInt("discount")/100);
                 return total;
             }
         } catch (SQLException e) {

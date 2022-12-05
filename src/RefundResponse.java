@@ -8,20 +8,14 @@ import java.sql.SQLException;
 
 public class RefundResponse {
 	
-	private String refundID;
+	private int refundID;
 
 	public RefundResponse() {
 		Database.connect();
 	}
 
-	public void setRefundID(String refundID) {
-		this.refundID = refundID;
-		}
-	
-	
 	
 	private void deleteRequest(int refundID) {
-		
 		String query = "DELETE FROM refund WHERE refund_id =? ";
 
 		PreparedStatement statement = null;
@@ -34,71 +28,87 @@ public class RefundResponse {
 		}
 
 	}
-	
-	
-	
-	private String getPaymentID() throws SQLException {
+
+	private int getPaymentID() throws SQLException {
 		
-		String query = "SELECT payment_id FROM refund "
+		String query = "SELECT transaction_id FROM refund "
 				+ "WHERE refund_id = " + refundID + ";";
 		
 		 Statement statement = Database.connection.createStatement();
 		 ResultSet result  = statement.executeQuery(query);	
 		 
-		 String paymentID = null;
+		 int paymentID=0;
 		 
 		 if(result.next()) {
-		        paymentID = Integer.toString(result.getInt("payment_id"));
+		        paymentID = result.getInt("transaction_id");
 		 }
 		 
-		 deleteRequest(Integer.parseInt(refundID));
+		 deleteRequest(refundID);
 		 return paymentID;
 	}
 	
-	private String getUser() throws SQLException {
-		
-		String paymentID = getPaymentID();
-		
-		String query = "SELECT * FROM payment "
-				+ "WHERE id = " +  paymentID + ";";
+	private User getUser() {
+		User user = null ;
+		int paymentID = 0;
+		try {
+			paymentID = getPaymentID();
+		String query = "SELECT * FROM transactions"
+				+ " WHERE id = " +  paymentID + ";";
 		
 		 Statement statement = Database.connection.createStatement();
 		 ResultSet result  = statement.executeQuery(query);	
 		 
-		 String username = null ;
+
 		 if(result.next()) {
-			  username = result.getString("username");
+			 user=new User();
+			  user.setUserName ( result.getString("username"));
+			  user.setWallet(result.getDouble("price"));
 		 }
-		 System.out.println(username);
-		 
-		 return username;
+		 Statement statement1 =Database.connection.createStatement();
+		 query="UPDATE public.transactions SET refund=true WHERE id="+paymentID;
+		 statement1.executeQuery(query);
+		} catch (SQLException e) {
+			System.out.println("Error");;
+		}
+
+
+		return user;
 	}
 	
 	
-	public void acceptRefund() throws SQLException {
-		
-		 String  username = getUser();
-		 System.out.println(username);
-		 
-			Integer wallet = 30;
-			String query = "UPDATE users SET wallet =? "
-					+ "WHERE username =? ;";
-			PreparedStatement statement = Database.connection.prepareStatement(query);
-			
-			statement.setInt(1, wallet);
-			statement.setString(2, username);
-		    int row = statement.executeUpdate();
-		    if(row > 0) {
-		    	System.out.println("Succsesful Operation.");
-		    }
-		    else {
-		    	System.out.println("Please Try again Later");
-		    }
-			
+	public void acceptRefund() {
+
+		User  user = null;
+		try {
+			user = getUser();
+			String query ="Select * from users where username='"+user.getUserName()+"'";
+			Statement statement1=Database.connection.createStatement();
+			ResultSet resultSet=statement1.executeQuery(query);
+			if (resultSet.next()) {
+				user.setWallet(user.getWallet()+resultSet.getDouble("wallet"));
+				query = "UPDATE users SET wallet =? "
+						+ "WHERE username =? ;";
+				PreparedStatement statement = Database.connection.prepareStatement(query);
+
+				statement.setInt(1, (int) user.getWallet());
+				statement.setString(2, user.getUserName());
+				int row = statement.executeUpdate();
+				if (row > 0) {
+					System.out.println("Successful Operation.");
+				} else {
+					System.out.println("Please Try again Later");
+				}
+			}
+		} catch (SQLException e) {
+			System.out.println(e);
+			System.out.println("Error");
+		}
 		 
 	}
-	
-	
+
+	public void setRefundID(int refundID) {
+		this.refundID = refundID;
+	}
 	
 	
 

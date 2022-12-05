@@ -6,6 +6,10 @@ public class User {
     private double wallet;
     private boolean firstTime;
 
+    public User(){
+
+    }
+
     public User(String userName, String password, String email, String name, double wallet,boolean firstTime) {
         this.userName = userName;
         this.password = password;
