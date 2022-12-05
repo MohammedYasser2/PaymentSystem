@@ -1,34 +1,33 @@
 package com.admin;
 
 import java.sql.Statement;
-import java.sql.Connection;
+
+import database.Database;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import database.DatabaseConnection;
 
 public class RefundResponse {
 	
 	private String refundID;
-	Connection connection; 
-	
-	RefundResponse(){
-		
-		connection = DatabaseConnection.getConnection();
+
+	public RefundResponse() {
+		Database.connect();
 	}
-	
+
 	public void setRefundID(String refundID) {
 		this.refundID = refundID;
 		}
 	
 	
 	
-	private void deleteRquest(int refundID) throws SQLException {
+	private void deleteRequest(int refundID) throws SQLException {
 		
 		String query = "DELETE FROM refund WHERE refund_id =? ";
 		
-		PreparedStatement statement = connection.prepareStatement(query);	
+		PreparedStatement statement = Database.connection.prepareStatement(query);
 		
 		statement.setInt(1, refundID);
 		statement.executeUpdate();
@@ -41,7 +40,7 @@ public class RefundResponse {
 		String query = "SELECT payment_id FROM refund "
 				+ "WHERE refund_id = " + refundID + ";";
 		
-		 Statement statement = connection.createStatement();
+		 Statement statement = Database.connection.createStatement();
 		 ResultSet result  = statement.executeQuery(query);	
 		 
 		 String paymentID = null;
@@ -50,7 +49,7 @@ public class RefundResponse {
 		        paymentID = Integer.toString(result.getInt("payment_id"));
 		 }
 		 
-		 deleteRquest(Integer.parseInt(refundID));
+		 deleteRequest(Integer.parseInt(refundID));
 		 return paymentID;
 	}
 	
@@ -61,7 +60,7 @@ public class RefundResponse {
 		String query = "SELECT * FROM payment "
 				+ "WHERE id = " +  paymentID + ";";
 		
-		 Statement statement = connection.createStatement();
+		 Statement statement = Database.connection.createStatement();
 		 ResultSet result  = statement.executeQuery(query);	
 		 
 		 String username = null ;
@@ -82,7 +81,7 @@ public class RefundResponse {
 			Integer wallet = 30;
 			String query = "UPDATE users SET wallet =? "
 					+ "WHERE username =? ;";
-			PreparedStatement statement = connection.prepareStatement(query);
+			PreparedStatement statement = Database.connection.prepareStatement(query);
 			
 			statement.setInt(1, wallet);
 			statement.setString(2, username);
