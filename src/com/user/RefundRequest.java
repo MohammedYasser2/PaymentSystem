@@ -1,37 +1,52 @@
 package com.user;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
-import database.DatabaseConnection;
+import database.Database;
+
 
 public class RefundRequest {
     
-	private int payment_id;
-	private Connection connection;
+	private int paymentID; 
+
+	public RefundRequest(int paymentID) {
+		this.paymentID = paymentID;
+		Database.connect();
+	}
+
 	
-	public RefundRequest() {	
-		connection = DatabaseConnection.getConnection();
+	private boolean isRefunded() throws SQLException {
+		
+		  boolean refunded = false;
+		  String query = "SELECT  * FROM Payment WHERE payment_id = " + paymentID;
+		  
+		  Statement statement = Database.connection.createStatement();
+		  ResultSet result  = statement.executeQuery(query);	
+		  if(result.next()) {
+				  refunded = result.getBoolean("refund");
+			 }
+		  
+		  return refunded;
 	}
 	
-	
-	public int getPaymentId() {
-		return payment_id;
-	}
-	
-	public void makeRefundRequest(int payment_id) throws SQLException {
+	public boolean makeRefundRequest(int payment_id) throws SQLException {
+		
+		System.out.println(isRefunded());
+
+		if(isRefunded()) {return false;}	
 		
         String query = "INSERT INTO refund (payment_id)" + "VALUES(?)";
 		
-		PreparedStatement statement = connection.prepareStatement(query);
+		PreparedStatement statement = Database.connection.prepareStatement(query);
 		
 		statement.setInt(1, payment_id);
-		int rows = statement.executeUpdate();
+		statement.executeUpdate();
+		Database.disconnect();
 		
-		if(rows > 0) {
-			System.out.println("Your request has been sent");
-		}
+		return true;
 
 	}
 	
