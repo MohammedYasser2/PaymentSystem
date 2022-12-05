@@ -20,14 +20,19 @@ public class RefundResponse {
 	
 	
 	
-	private void deleteRequest(int refundID) throws SQLException {
+	private void deleteRequest(int refundID) {
 		
 		String query = "DELETE FROM refund WHERE refund_id =? ";
-		
-		PreparedStatement statement = Database.connection.prepareStatement(query);
-		
-		statement.setInt(1, refundID);
-		statement.executeUpdate();
+
+		PreparedStatement statement = null;
+		try {
+			statement = Database.connection.prepareStatement(query);
+			statement.setInt(1, refundID);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Error");
+		}
+
 	}
 	
 	

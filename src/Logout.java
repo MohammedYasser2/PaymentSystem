@@ -1,5 +1,5 @@
 public class Logout {
-    public Logout(Login login) {
+    public Logout(LoginUser login) {
         login.setUser(null);
         System.out.println("Logout Success");
     }

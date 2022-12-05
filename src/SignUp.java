@@ -28,13 +28,13 @@ public class SignUp {
         try {
             Statement statement=Database.connection.createStatement();
             ResultSet resultSet= statement.executeQuery(query);
-            if (resultSet.getRow()>0){
+            if (resultSet.next()){
                 resultSet=statement.executeQuery(query2);
-                if (resultSet.getRow()>0){
-                    System.out.println("This UserName is Already Exists");
+                System.out.println("This UserName is Already Exists");
+                if (resultSet.next()){
+                    System.out.println("This Email is Already Exists");
                     return false;
                 }
-                System.out.println("This Email is Already Exists");
                 return false;
             }
         } catch (SQLException e) {

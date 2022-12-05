@@ -4,13 +4,23 @@ public class User {
     private String email;
     private String name;
     private double wallet;
+    private boolean firstTime;
 
-    public User(String userName, String password, String email, String name, double wallet) {
+    public User(String userName, String password, String email, String name, double wallet,boolean firstTime) {
         this.userName = userName;
         this.password = password;
         this.email = email;
         this.name = name;
         this.wallet = wallet;
+        this.firstTime=firstTime;
+    }
+
+    public boolean isFirstTime() {
+        return firstTime;
+    }
+
+    public void setFirstTime(boolean firstTime) {
+        this.firstTime = firstTime;
     }
 
     public String getUserName() {
